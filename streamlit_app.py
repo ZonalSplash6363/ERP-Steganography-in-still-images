@@ -11,7 +11,7 @@ from cryptography.hazmat.primitives import hashes
 
 
 
-# ===TO RUN CORRECTLY, PRESS RUN THEN TYPE: "streamlit run <name_of_file.py>"====
+ # ===TO RUN CORRECTLY, PRESS RUN THEN TYPE: "streamlit run <name_of_file.py>"====
 
 
 
