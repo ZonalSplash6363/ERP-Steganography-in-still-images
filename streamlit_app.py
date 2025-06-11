@@ -93,11 +93,11 @@ def derive_key(password: str, salt: bytes):
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length = 32,
-        salt=salt(),
+        salt=salt,
         iterations = 10000,
         backend=default_backend()
     )
-    return kdf.derive(password.encode) # Returns a 32-byte encryption key
+    return kdf.derive(password.encode()) # Returns a 32-byte encryption key
 
 
 # AES encryption 
@@ -132,6 +132,11 @@ def decrypt_message(encrypted_message, password):
     # Remove padding
     pad_length = ord(decrypted_message[-1:])
     return decrypted_message[:-pad_length].decode()
+
+
+
+
+
 
 
 
@@ -198,20 +203,25 @@ with tab1:
 with tab2:
     st.header("Retrieve a Hidden Message")
     uploaded_image_decode = st.file_uploader("Upload an image file to decode", type=["png"])
-    
-    if st.button("Decode Message"):
-        if uploaded_image_decode:
-            try:
-                image = Image.open(uploaded_image_decode)
-                hidden_message = decode_image(image)
-                if hidden_message:
-                    st.success(f"Hidden message: {hidden_message}")
-                else:
-                    st.warning("No hidden message found in the image.")
+    decode_password = st.text_input("Enter the password to decrypt the hidden message", type="password")
 
+    if uploaded_image_decode and decode_password:
+        try:
+            image = Image.open(uploaded_image_decode)
+            try:
+                hidden_message_encrypted = decode_image(image)
+                hidden_message = decrypt_message(hidden_message_encrypted, decode_password)
             except Exception as e:
-                st.error(f"Error: {e}")
-        else:
-            st.warning("Please upload a .png image to decode.")
+                st.error(f"Decryption failed: {e}")
+                st.stop()
+            if hidden_message:
+                st.success(f"Hidden message: {hidden_message}")
+            else:
+                st.warning("Incorrect Password.")
+
+        except Exception as e:
+            st.error(f"Error: {e}")
+    else:
+        st.warning("Please upload a .png image to decode and enter the password.")
 
 
